@@ -25,6 +25,25 @@ spec:
         {{- include "polaris.selectors" . | nindent 8 }}
         component: webhook
     spec:
+      initContainers:
+      - name: webhook-certificate-generator
+        image: quay.io/joelspeed/webhook-certificate-generator:v0.1.1
+        imagePullPolicy: '{{.Values.image.pullPolicy}}'
+        args:
+          - --service-name=polaris-webhook
+          - --namespace={{ .Release.Namespace }}
+          - --secret-name=polaris-webhook
+          - --patch-validating=polaris-webhook
+          - --auto-approve-csr
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
       containers:
         - name: webhook
           command:
