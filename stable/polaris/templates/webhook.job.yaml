@@ -1,0 +1,55 @@
+{{- if and .Values.webhook.enable -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "polaris.fullname" . }}-certificate-updater
+  {{- if .Values.templateOnly }}
+  namespace: {{ .Release.Namespace }}
+  {{- end }}
+  labels:
+    {{ include "polaris.labels" . | nident 4 }}
+    component: certificate-updater
+spec:
+  template:
+    metadata:
+      labels:
+        {{ include "polaris.labels" . | nident 8 }}
+        component: certificate-updater
+    spec:
+      containers:
+      - name: webhook-certificate-generator
+        image: '{{.Values.certificateupdater.image.repository}}:{{.Values.certificateupdater.image.tag}}'
+        imagePullPolicy: Always
+        command:
+          - ./generate_certificate.sh
+          - --service
+          - polaris-webhook
+          - --namespace
+          - polaris
+          - --secret
+          - polaris-webhook
+          - --webhook
+          - polaris-webhook
+          - --webhook-kind
+          - ValidatingWebhookConfiguration
+        resources:
+          {{- toYaml .Values.certificateupdater.resources | nindent 10 }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp/
+          readOnly: false
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+      serviceAccountName:  {{ include "polaris.fullname" . }}-certificates
+      restartPolicy: Never
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end -}}

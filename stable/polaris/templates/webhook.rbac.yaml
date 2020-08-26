@@ -1,4 +1,14 @@
 {{- if and .Values.webhook.enable -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "polaris.fullname" . }}-certificates
+  {{- if .Values.templateOnly }}
+  namespace: {{ .Release.Namespace }}
+  {{- end }}
+  labels:
+    {{- include "polaris.labels" . | nindent 4 }}
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
@@ -6,8 +16,6 @@ metadata:
   labels:
     {{- include "polaris.labels" . | nindent 4 }}
 rules:
-  # required by controller-runtime code doing a cluster wide lookup
-  # when it seems namespace would suffice
   - apiGroups:
       - ''
     resources:
@@ -26,6 +34,15 @@ rules:
     - 'get'
     - 'update'
     - 'create'
+    - 'delete'
+  - apiGroups:
+    - 'certificates.k8s.io'
+    resources:
+    - 'signers'
+    resourceNames:
+    - 'kubernetes.io/legacy-unknown'
+    verbs:
+    - 'approve'
   - apiGroups:
       - 'admissionregistration.k8s.io'
     resources:
@@ -45,7 +62,7 @@ roleRef:
   name: {{ include "polaris.fullname" . }}-webhook
 subjects:
   - kind: ServiceAccount
-    name: {{ include "polaris.fullname" . }}
+    name: {{ include "polaris.fullname" . }}-certificates
     namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -82,6 +99,6 @@ roleRef:
   name: {{ include "polaris.fullname" . }}-webhook
 subjects:
   - kind: ServiceAccount
-    name: {{ include "polaris.fullname" . }}
+    name: {{ include "polaris.fullname" . }}-certificates
     namespace: {{ .Release.Namespace }}
 {{- end -}}

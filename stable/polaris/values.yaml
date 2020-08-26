@@ -27,6 +27,18 @@ dashboard:
       cpu: 150m
       memory: 512Mi
 
+certificateupdater:
+  image:
+    repository: "newrelic/k8s-webhook-cert-manager"
+    tag: "1.3.0"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 150m
+      memory: 512Mi
+
 webhook:
   enable: false
   replicas: 1

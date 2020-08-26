@@ -49,6 +49,9 @@ Parameter | Description | Default
 `webhook.service.type` | Service type | ClusterIP
 `webhook.nodeSelector` | Webhook pod nodeSelector | {}
 `webhook.tolerations` | Webhook pod tolerations | []
+`certificateupdater.image.repository` | Image repository for the job to update the certificate used for the webhook | newrelic/k8s-webhook-cert-manager
+`certificateupdater.image.tag` | Tag used for the job to update certificates | 1.3.0
+`certificateupdate.resources` | Requests and limits for the job to update certificates | (see values.yaml)
 `audit.enable` | Runs a one-time audit. This is used internally at Fairwinds, and may not be useful for others | false
 `audit.outputURL` | A URL which will receive a POST request with audit results | ""
 `audit.cleanup` | Whether to delete the namespace once the audit is finished | false
