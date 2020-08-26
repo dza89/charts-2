@@ -7,13 +7,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
   {{- end }}
   labels:
-    {{ include "polaris.labels" . | nident 4 }}
+    {{ include "polaris.labels" . | nindent 4 }}
     component: certificate-updater
 spec:
   template:
     metadata:
       labels:
-        {{ include "polaris.labels" . | nident 8 }}
+        {{ include "polaris.labels" . | nindent 8 }}
         component: certificate-updater
     spec:
       containers:
