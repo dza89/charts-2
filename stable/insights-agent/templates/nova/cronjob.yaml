@@ -1,0 +1,35 @@
+{{- if .Values.nova.enabled -}} 
+{{- $_ := set . "Label" "nova" }}
+{{- $_ := set . "Config" .Values.nova }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  {{- include "metadata" .Label }}
+spec:
+  {{ include "cronjob-spec" . | nindent 2 | trim }}
+  jobTemplate:
+    spec:
+      {{ include "job-spec" . | nindent 6 | trim }}
+      template:
+        spec:
+          {{ include "job-template-spec" . | indent 10 | trim }}
+          containers:
+          - {{ include "container-spec" . | indent 12 | trim }}
+            command:
+              - /nova
+              - find
+              - -u
+              - https://charts.fairwinds.com/stable
+              - -u
+              - https://charts.fairwinds.com/incubator
+              - -u
+              - https://kubernetes-charts.storage.googleapis.com
+              - -u
+              - https://kubernetes-charts-incubator.storage.googleapis.com
+              - --output-file
+              - /output/nova.json
+              - --helm-version
+              - auto
+            {{ include "security-context" . | indent 12 | trim }}
+          {{ include "uploaderContainer" . | indent 10 | trim }}
+{{- end -}}

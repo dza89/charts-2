@@ -63,10 +63,11 @@ containers:
     mountPath: /usr/local/mount-from-host/bin
     readOnly: true
   securityContext:
+    readOnlyRootFilesystem: true
     allowPrivilegeEscalation: false
+    privileged: false
+    runAsNonRoot: false
     capabilities:
       drop:
-      - ALL
-    privileged: false
-    readOnlyRootFilesystem: true
+        - ALL
 {{- end -}}

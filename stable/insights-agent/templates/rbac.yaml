@@ -32,6 +32,11 @@ subjects:
   name: {{ include "insights-agent.fullname" . }}-cronjob-executor
   namespace: {{ .Release.Namespace }}
 {{- end }}
+{{- if .Values.opa.enabled }}
+- kind: ServiceAccount
+  name: {{ include "insights-agent.fullname" . }}-opa
+  namespace: {{ .Release.Namespace }}
+{{- end }}
 {{- if .Values.goldilocks.enabled }}
 - kind: ServiceAccount
   name: {{ include "insights-agent.fullname" . }}-goldilocks
@@ -67,7 +72,7 @@ subjects:
   name: {{ include "insights-agent.fullname" . }}-rbac-reporter
   namespace: {{ .Release.Namespace }}
 {{- end }}
-{{- if .Values.releasewatcher.enabled }}
+{{- if .Values.nova.enabled }}
 - kind: ServiceAccount
   name: {{ include "insights-agent.fullname" . }}-release-watcher
   namespace: {{ .Release.Namespace }}
